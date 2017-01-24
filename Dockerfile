@@ -1,28 +1,35 @@
 FROM ubuntu:16.04
-MAINTAINER nate@endot.org
+MAINTAINER joshle joshle@qq.com
 
-ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update
+RUN mv /etc/apt/sources.list /etc/apt/sources.list.1
+COPY sources.list /etc/apt/sources.list
+
+RUN apt-get -y update
+RUN apt-get -y upgrade
 RUN apt-get install libfontconfig libfreetype6 software-properties-common -y
-RUN add-apt-repository ppa:chris-lea/node.js -y
-RUN apt-get update
-RUN apt-get install nodejs -y
+RUN apt-get install wget fontconfig xfonts-utils bzip2 -y
+ADD MicrosoftYaHei.ttf  /usr/share/fonts/
+WORKDIR /usr/share/fonts/
+RUN mkfontscale
+RUN mkfontdir
+RUN fc-cache
 
-RUN npm install --global pageres
+RUN apt-get install libfontconfig libfreetype6 software-properties-common -y
+WORKDIR /usr/local
+RUN wget https://npm.taobao.org/mirrors/node/v6.9.4/node-v6.9.4-linux-x64.tar.gz
+RUN tar zxvf node-v6.9.4-linux-x64.tar.gz
+RUN mv node-v6.9.4-linux-x64 node-v6.9.4
+RUN cp node-v6.9.4/bin/node bin/node
+WORKDIR /usr/local/bin
+RUN ln -s /usr/local/node-v6.9.4/lib/node_modules/npm/bin/npm-cli.js npm
+RUN npm install -g cnpm --registry=https://registry.npm.taobao.org
+RUN cnpm install --global pageres-cli
 
 RUN mkdir /pageres
 WORKDIR /pageres
 RUN addgroup --gid 1000 pageres
 RUN adduser --uid 1000 --gid 1000 pageres --home /pageres --no-create-home --disabled-password --gecos ''
 RUN chown -R pageres.pageres /pageres
-
-RUN mkdir -p /usr/share/fonts/chinese/TrueType
-ADD MicrosoftYaHei.ttf /usr/share/fonts/chinese/TrueType
-RUN chmod 755 /usr/share/fonts/chinese/TrueType/*.ttf
-RUN apt-get install xfonts-utils fontconfig -y
-RUN mkfontscale
-RUN mkfontdir
-RUN fc-cache -fv
 
 ADD run.sh /run.sh
 RUN chmod +x /run.sh
