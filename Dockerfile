@@ -6,7 +6,6 @@ COPY sources.list /etc/apt/sources.list
 
 RUN apt-get -y update
 RUN apt-get -y upgrade
-RUN apt-get install libfontconfig libfreetype6 software-properties-common -y
 RUN apt-get install wget fontconfig xfonts-utils bzip2 -y
 ADD MicrosoftYaHei.ttf  /usr/share/fonts/
 WORKDIR /usr/share/fonts/
@@ -14,12 +13,12 @@ RUN mkfontscale
 RUN mkfontdir
 RUN fc-cache
 
-RUN apt-get install libfontconfig libfreetype6 software-properties-common -y
 WORKDIR /usr/local
 RUN wget https://npm.taobao.org/mirrors/node/v6.9.4/node-v6.9.4-linux-x64.tar.gz
 RUN tar zxvf node-v6.9.4-linux-x64.tar.gz
+RUN rm -f node-v6.9.4-linux-x64.tar.gz
 RUN mv node-v6.9.4-linux-x64 node-v6.9.4
-RUN cp node-v6.9.4/bin/node bin/node
+RUN mv node-v6.9.4/bin/node bin/node
 WORKDIR /usr/local/bin
 RUN ln -s /usr/local/node-v6.9.4/lib/node_modules/npm/bin/npm-cli.js npm
 RUN npm install -g cnpm --registry=https://registry.npm.taobao.org
